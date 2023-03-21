@@ -23,6 +23,11 @@ public class SendMsgController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    /**
+     * 发送到延迟队列
+     * @param message
+     * @return
+     */
     @GetMapping("/sendMsg/{message}")
     public String sendMsg(@PathVariable String message) {
         log.info("当前时间：{},发送一条信息给两个 TTL 队列:{}", new Date(), message);
@@ -31,5 +36,20 @@ public class SendMsgController {
         rabbitTemplate.convertAndSend("X","XA",prefix1+message);
         rabbitTemplate.convertAndSend("X","XB",prefix2+message);
         return "发送到X交换机成功";
+    }
+
+    /**
+     * 发送延迟消息
+     * @param message
+     * @param ttlTime
+     */
+    @GetMapping("/sendExpirationMsg/{message}/{ttlTime}")
+    public String sendMsg(@PathVariable String message,@PathVariable String ttlTime) {
+        rabbitTemplate.convertAndSend("X", "XC", message, correlationData ->{
+            correlationData.getMessageProperties().setExpiration(ttlTime);
+            return correlationData;
+        });
+        log.info("当前时间：{},发送一条时长：{}毫秒 TTL消息：{} 给队列：QC", new Date(),ttlTime, message);
+        return "发送个延迟消息到队列QC";
     }
 }
