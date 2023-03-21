@@ -3,6 +3,7 @@ package com.itguigu.rabbitmq.config;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 
 /**
- * 延迟队列
+ * 1-延迟队列
  *
  * @Author darren
  * @Date 2023/3/21 11:30
@@ -27,12 +28,12 @@ public class TtlQueueConfig {
 
     @Bean("xExchange")
     public DirectExchange xExchange(){
-        return new DirectExchange(X_EXCHANGE);
+        return ExchangeBuilder.directExchange(X_EXCHANGE).build();
     }
 
     @Bean("yExchange")
     public DirectExchange yExchange(){
-        return new DirectExchange(Y_DEAD_LETTER_EXCHANGE);
+        return ExchangeBuilder.directExchange(Y_DEAD_LETTER_EXCHANGE).build();
     }
 
     @Bean("queueA")

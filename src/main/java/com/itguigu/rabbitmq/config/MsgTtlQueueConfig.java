@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- *
+ * 2-延时消息
  * @Author darren
  * @Date 2023/3/21 18:00
  */

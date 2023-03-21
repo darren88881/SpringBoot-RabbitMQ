@@ -44,12 +44,32 @@ public class SendMsgController {
      * @param ttlTime
      */
     @GetMapping("/sendExpirationMsg/{message}/{ttlTime}")
-    public String sendMsg(@PathVariable String message,@PathVariable String ttlTime) {
+    public String sendExpirationMsg(@PathVariable String message,@PathVariable String ttlTime) {
         rabbitTemplate.convertAndSend("X", "XC", message, correlationData ->{
             correlationData.getMessageProperties().setExpiration(ttlTime);
             return correlationData;
         });
         log.info("当前时间：{},发送一条时长：{}毫秒 TTL消息：{} 给队列：QC", new Date(),ttlTime, message);
         return "发送个延迟消息到队列QC";
+    }
+
+    /**
+     * 发送到延时交换机
+     * 消息在交换机中具有按时间排序的功能
+     * @return
+     */
+    @GetMapping("/sendDelayedExchangeMsg/{message}/{delayTime}")
+    public String senddelayedExchangeMsg(@PathVariable String message, @PathVariable Integer delayTime) {
+
+        rabbitTemplate.convertAndSend(
+                "delayed.exchange",
+                "delayed.routing.key",
+                message,
+                messagePostProcessor ->{
+                    messagePostProcessor.getMessageProperties().setDelay(delayTime);
+                    return messagePostProcessor;
+                });
+        log.info(" 当前时间：{}, 发送一条延迟:{} 毫秒的消息给队列delayed.queue:{}", new Date(),delayTime, message);
+        return "发送延时交换机的消息成功";
     }
 }
