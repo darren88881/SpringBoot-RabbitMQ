@@ -29,15 +29,6 @@ public class ProducerController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    private MyCallBack myCallBack;
-
-    //依赖注入 rabbitTemplate 之后再设置它的回调对象
-    @PostConstruct
-    public void init(){
-        rabbitTemplate.setConfirmCallback(myCallBack);
-    }
-
     /**
      * 发布消息
      *
