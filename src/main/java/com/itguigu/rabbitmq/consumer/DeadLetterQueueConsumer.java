@@ -1,5 +1,6 @@
 package com.itguigu.rabbitmq.consumer;
 
+import com.itguigu.rabbitmq.util.QueueUtilInterface;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -16,15 +17,22 @@ import java.util.Date;
 @Component
 @Slf4j
 public class DeadLetterQueueConsumer {
-    @RabbitListener(queues = "QD")
+
+    @RabbitListener(queues = QueueUtilInterface.QUEUE_D)
     public void receiveD(Message message) {
         String msg = new String(message.getBody());
-        log.info("当前时间：{},收到死信队列信息：{}", new Date().toString(), msg);
+        log.info("当前时间：{},收到死信队列:{} 的信息：{}",
+                new Date().toString(),
+                QueueUtilInterface.QUEUE_D,
+                msg);
     }
 
-    @RabbitListener(queues = "delayed.queue")
+    @RabbitListener(queues = QueueUtilInterface.DELAYED_QUEUE_NAME)
     public void receiveDelayedQueue(Message message) {
         String msg = new String(message.getBody());
-        log.info("当前时间：{},收到延交换机绑定队列的消息：{}", new Date().toString(), msg);
+        log.info("当前时间：{},收到延交换机绑定队列:{} 的消息：{}",
+                new Date().toString(),
+                QueueUtilInterface.DELAYED_QUEUE_NAME,
+                msg);
     }
 }

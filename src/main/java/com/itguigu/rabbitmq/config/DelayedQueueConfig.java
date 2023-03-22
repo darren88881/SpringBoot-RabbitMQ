@@ -1,5 +1,8 @@
 package com.itguigu.rabbitmq.config;
 
+import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
+import com.itguigu.rabbitmq.util.QueueUtilInterface;
+import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.CustomExchange;
@@ -26,19 +29,17 @@ import java.util.Map;
 @Configuration
 public class DelayedQueueConfig {
 
-    public static final String DELAYED_EXCHANGE_NAME = "delayed.exchange";
-    public static final String DELAYED_ROUTING_KEY = "delayed.routing.key";
-    public static final String DELAYED_QUEUE_NAME = "delayed.queue";
-
     /**
      * 自定义交换机-延迟交换机
      * @return
      */
-    @Bean
+    @Bean("delayedExchange")
     public CustomExchange delayedExchange(){
         Map<String, Object> args = new HashMap<>();
         args.put("x-delayed-type", "direct");
-        return new CustomExchange(DELAYED_EXCHANGE_NAME, "x-delayed-message", true, false, args);
+        return new CustomExchange(
+                ExchangeUtilInterface.DELAYED_EXCHANGE_NAME,
+                "x-delayed-message", true, false, args);
     }
 
     /**
@@ -46,9 +47,9 @@ public class DelayedQueueConfig {
      *
      * @return
      */
-    @Bean
+    @Bean("delayedQueue")
     public Queue delayedQueue(){
-        return QueueBuilder.durable(DELAYED_QUEUE_NAME).build();
+        return QueueBuilder.durable(QueueUtilInterface.DELAYED_QUEUE_NAME).build();
     }
 
     /**
@@ -61,6 +62,7 @@ public class DelayedQueueConfig {
     public Binding delayedQueueBindingDelayedExchange(
             @Qualifier("delayedQueue") Queue delayedQueue,
             @Qualifier("delayedExchange") CustomExchange delayedExchange ){
-        return BindingBuilder.bind(delayedQueue).to(delayedExchange).with(DELAYED_ROUTING_KEY).noargs();
+        return BindingBuilder.bind(delayedQueue).to(delayedExchange)
+                .with(RoutingKeyUtilInterface.DELAYED_ROUTING_KEY).noargs();
     }
 }

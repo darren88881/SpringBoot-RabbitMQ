@@ -1,5 +1,8 @@
 package com.itguigu.rabbitmq.config;
 
+import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
+import com.itguigu.rabbitmq.util.QueueUtilInterface;
+import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -18,21 +21,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Slf4j
 public class MsgTtlQueueConfig {
-    public static final String Y_DEAD_LETTER_EXCHANGE = "Y";
-    public static final String QUEUE_C = "QC";
+
 
     @Bean("queueC")
     public Queue queueC(){
-        return QueueBuilder.durable(QUEUE_C)
-                .deadLetterExchange(Y_DEAD_LETTER_EXCHANGE)
-                .deadLetterRoutingKey("YD")
+        return QueueBuilder.durable(QueueUtilInterface.QUEUE_C)
+                //声明当前队列绑定的死信交换机
+                .deadLetterExchange(ExchangeUtilInterface.Y_DEAD_LETTER_EXCHANGE)
+                //声明当前队列的死信路由 key
+                .deadLetterRoutingKey(RoutingKeyUtilInterface.YD_ROUTING_KEY)
                 .build();
     }
 
     @Bean
     public Binding queueCBindingExchange(@Qualifier("queueC") Queue queueC,
             @Qualifier("xExchange") DirectExchange xExchange){
-        return BindingBuilder.bind(queueC).to(xExchange).with("XC");
+        return BindingBuilder.bind(queueC).to(xExchange).with(RoutingKeyUtilInterface.XC_ROUTING_KEY);
     }
 
 }

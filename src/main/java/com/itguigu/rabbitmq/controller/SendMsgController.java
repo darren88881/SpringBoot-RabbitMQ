@@ -1,6 +1,10 @@
 package com.itguigu.rabbitmq.controller;
 
+import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
+import com.itguigu.rabbitmq.util.QueueUtilInterface;
+import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  *
@@ -30,11 +35,26 @@ public class SendMsgController {
      */
     @GetMapping("/sendMsg/{message}")
     public String sendMsg(@PathVariable String message) {
-        log.info("当前时间：{},发送一条信息给两个 TTL 队列:{}", new Date(), message);
-        String prefix1 = "消息来自 ttl 为 10S 的队列: ";
-        String prefix2 = "消息来自 ttl 为 40S 的队列: ";
-        rabbitTemplate.convertAndSend("X","XA",prefix1+message);
-        rabbitTemplate.convertAndSend("X","XB",prefix2+message);
+        UUID uuid = UUID.randomUUID();
+        CorrelationData correlationData = new CorrelationData(uuid.toString());
+
+        log.info("发送一条信息给两个TTL队列:{}和:{}",
+                QueueUtilInterface.QUEUE_A,
+                QueueUtilInterface.QUEUE_B);
+        String prefix1 = "消息来自ttl为10S的"+QueueUtilInterface.QUEUE_A+"队列:";
+        String prefix2 = "消息来自ttl为40S的"+QueueUtilInterface.QUEUE_B+"队列:";
+        rabbitTemplate.convertAndSend(
+                ExchangeUtilInterface.X_EXCHANGE,
+                RoutingKeyUtilInterface.XA_ROUTING_KEY,
+                prefix1 + message,
+                correlationData);
+        log.info(QueueUtilInterface.QUEUE_A+"的消息为："+prefix1 + message);
+        rabbitTemplate.convertAndSend(
+                ExchangeUtilInterface.X_EXCHANGE,
+                RoutingKeyUtilInterface.XB_ROUTING_KEY,
+                prefix2 + message,
+                correlationData);
+        log.info(QueueUtilInterface.QUEUE_B+"的消息为："+prefix2 + message);
         return "发送到X交换机成功";
     }
 
@@ -44,12 +64,20 @@ public class SendMsgController {
      * @param ttlTime
      */
     @GetMapping("/sendExpirationMsg/{message}/{ttlTime}")
-    public String sendExpirationMsg(@PathVariable String message,@PathVariable String ttlTime) {
-        rabbitTemplate.convertAndSend("X", "XC", message, correlationData ->{
-            correlationData.getMessageProperties().setExpiration(ttlTime);
-            return correlationData;
-        });
-        log.info("当前时间：{},发送一条时长：{}毫秒 TTL消息：{} 给队列：QC", new Date(),ttlTime, message);
+    public String sendExpirationMsg(@PathVariable String message, @PathVariable String ttlTime) {
+        UUID uuid = UUID.randomUUID();
+        CorrelationData correlationData = new CorrelationData(uuid.toString());
+
+        rabbitTemplate.convertAndSend(
+                ExchangeUtilInterface.X_EXCHANGE,
+                RoutingKeyUtilInterface.XC_ROUTING_KEY,
+                message,
+                messagePostProcessor -> {
+                    messagePostProcessor.getMessageProperties().setExpiration(ttlTime);
+                    return messagePostProcessor;
+                },
+                correlationData);
+        log.info("发送一条时长：{}毫秒 TTL消息：{} 给队列：QC", ttlTime, message);
         return "发送个延迟消息到队列QC";
     }
 
@@ -59,17 +87,21 @@ public class SendMsgController {
      * @return
      */
     @GetMapping("/sendDelayedExchangeMsg/{message}/{delayTime}")
-    public String senddelayedExchangeMsg(@PathVariable String message, @PathVariable Integer delayTime) {
-
+    public String sendDelayedExchangeMsg(@PathVariable String message,
+            @PathVariable Integer delayTime) {
+        UUID uuid = UUID.randomUUID();
+        CorrelationData correlationData = new CorrelationData(uuid.toString());
         rabbitTemplate.convertAndSend(
-                "delayed.exchange",
-                "delayed.routing.key",
+                ExchangeUtilInterface.DELAYED_EXCHANGE_NAME,
+                RoutingKeyUtilInterface.DELAYED_ROUTING_KEY,
                 message,
-                messagePostProcessor ->{
+                messagePostProcessor -> {
                     messagePostProcessor.getMessageProperties().setDelay(delayTime);
                     return messagePostProcessor;
-                });
-        log.info(" 当前时间：{}, 发送一条延迟:{} 毫秒的消息给队列delayed.queue:{}", new Date(),delayTime, message);
+                },
+                correlationData);
+        log.info("发送一条延迟:{} 毫秒的消息:{} 给交换机:{}",
+                delayTime, message, ExchangeUtilInterface.DELAYED_EXCHANGE_NAME);
         return "发送延时交换机的消息成功";
     }
 }
