@@ -1,20 +1,15 @@
 package com.itguigu.rabbitmq.controller;
 
-import com.itguigu.rabbitmq.confirm.MyCallBack;
-import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
-import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
+import com.itguigu.rabbitmq.util.CorrelationDataUtil;
+import com.itguigu.rabbitmq.util.ExchangeUtil;
+import com.itguigu.rabbitmq.util.RoutingKeyUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PostConstruct;
-import java.sql.SQLOutput;
-import java.util.UUID;
 
 /**
  * 发布确认模式-生产者
@@ -23,8 +18,8 @@ import java.util.UUID;
  */
 @RestController
 @Slf4j
-@RequestMapping("/confirm")
-public class ProducerController {
+@RequestMapping("/confirmExchange")
+public class ConfirmExchangeController {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -37,23 +32,22 @@ public class ProducerController {
      * @param message
      * @return
      */
-    @GetMapping("/sendConfirmMsg/{message}")
-    public String sendConfirmMsg(@PathVariable String message) {
-        UUID uuid = UUID.randomUUID();
-        CorrelationData correlationData = new CorrelationData(uuid.toString());
+    @GetMapping("/sendMessage/{message}")
+    public String sendMessage(@PathVariable String message) {
 
-        log.info("发送消息:{} 到交换机:{} ",message, ExchangeUtilInterface.CONFIRM_EXCHANGE_NAME);
+        log.info("发送消息:{} 到交换机:{} ",message, ExchangeUtil.CONFIRM_EXCHANGE_NAME);
         rabbitTemplate.convertAndSend(
-                ExchangeUtilInterface.CONFIRM_EXCHANGE_NAME,
-                RoutingKeyUtilInterface.CONFIRM_ROUTING_KEY,
+                ExchangeUtil.CONFIRM_EXCHANGE_NAME,
+                RoutingKeyUtil.CONFIRM_ROUTING_KEY,
                 message,
-                correlationData);
+                CorrelationDataUtil.getCorrelationData());
 
         rabbitTemplate.convertAndSend(
-                ExchangeUtilInterface.CONFIRM_EXCHANGE_NAME,
-                RoutingKeyUtilInterface.CONFIRM_ERROR_ROUTING_KEY,
+                ExchangeUtil.CONFIRM_EXCHANGE_NAME,
+                RoutingKeyUtil.CONFIRM_ERROR_ROUTING_KEY,
                 message,
-                correlationData);
+                CorrelationDataUtil.getCorrelationData());
         return "发布确认模式发送消息成功";
     }
+
 }

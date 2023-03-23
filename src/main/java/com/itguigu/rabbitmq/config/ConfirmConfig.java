@@ -1,8 +1,8 @@
 package com.itguigu.rabbitmq.config;
 
-import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
-import com.itguigu.rabbitmq.util.QueueUtilInterface;
-import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
+import com.itguigu.rabbitmq.util.ExchangeUtil;
+import com.itguigu.rabbitmq.util.QueueUtil;
+import com.itguigu.rabbitmq.util.RoutingKeyUtil;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -21,20 +21,25 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConfirmConfig {
 
+    /**
+     * 发布确认交换机并绑定备用交换机
+     * @return
+     */
     @Bean("confirmExchange")
     public DirectExchange confirmExchange() {
-        return ExchangeBuilder.directExchange(ExchangeUtilInterface.CONFIRM_EXCHANGE_NAME).build();
+        return ExchangeBuilder.directExchange(ExchangeUtil.CONFIRM_EXCHANGE_NAME)
+                .durable(true).withArgument("alternate-exchange", ExchangeUtil.BACKUP_EXCHANGE_NAME).build();
     }
 
     @Bean("confirmQueue")
     public Queue confirmQueue() {
-        return QueueBuilder.durable(QueueUtilInterface.CONFIRM_QUEUE_NAME).build();
+        return QueueBuilder.durable(QueueUtil.CONFIRM_QUEUE_NAME).build();
     }
 
     @Bean
     public Binding confirmQueueBindingConfirmExchange(
             @Qualifier("confirmExchange") DirectExchange confirmExchange,
             @Qualifier("confirmQueue") Queue confirmQueue) {
-        return BindingBuilder.bind(confirmQueue).to(confirmExchange).with(RoutingKeyUtilInterface.CONFIRM_ROUTING_KEY);
+        return BindingBuilder.bind(confirmQueue).to(confirmExchange).with(RoutingKeyUtil.CONFIRM_ROUTING_KEY);
     }
 }

@@ -1,5 +1,6 @@
 package com.itguigu.rabbitmq.confirm;
 
+import com.itguigu.rabbitmq.util.ExchangeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -42,14 +43,15 @@ public class MyCallBack implements RabbitTemplate.ConfirmCallback,RabbitTemplate
     public void confirm(final CorrelationData correlationData, final boolean ack, final String cause) {
         String id = correlationData != null ? correlationData.getId() : "";
         if(ack){
-            log.info("交换机已经收到id为:{} 的消息",id);
+            log.info("交换机确认回调方法已经收到id为:{} 的消息",id);
         }else{
-            log.info("交换机还未收到id为:{} 消息, 由于原因:{}", id, cause);
+            log.info("交换机确认回调方法还未收到id为:{} 消息, 由于原因:{}", id, cause);
         }
     }
 
     /**
-     * 当交换机无法路由回退消息
+     * 交换机返回消息的方法-消息未送达队列触发回调
+     * 常用于交换机无法路由回退消息
      *
      * @param message the returned message.
      * @param replyCode the 回复 code.
@@ -61,7 +63,10 @@ public class MyCallBack implements RabbitTemplate.ConfirmCallback,RabbitTemplate
     public void returnedMessage(final Message message, final int replyCode, final String replyText,
             final String exchange,
             final String routingKey) {
-        log.info("消息:{} 被交换机退回，回复内容:{}, 交换机是:{}, 路由 key:{}",
-                new String(message.getBody()),replyText, exchange, routingKey);
+        // 排除调延迟交换机，因为消息在延迟交换机中延迟，并未送达到队列则出发了此函数回调
+        if (!ExchangeUtil.DELAYED_EXCHANGE_NAME.equals(exchange)) {
+            log.info("交换机返回消息的方法收到的消息:{} 交换机回复的内容:{}, 交换机是:{}, 路由 key:{}",
+                    new String(message.getBody()),replyText, exchange, routingKey);
+        }
     }
 }

@@ -1,8 +1,8 @@
 package com.itguigu.rabbitmq.config;
 
-import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
-import com.itguigu.rabbitmq.util.QueueUtilInterface;
-import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
+import com.itguigu.rabbitmq.util.ExchangeUtil;
+import com.itguigu.rabbitmq.util.QueueUtil;
+import com.itguigu.rabbitmq.util.RoutingKeyUtil;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.CustomExchange;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @Date 2023/3/21 20:56
  */
 @Configuration
-public class DelayedQueueConfig {
+public class DelayedExchangeConfig {
 
     /**
      * 自定义交换机-延迟交换机
@@ -38,7 +38,7 @@ public class DelayedQueueConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-delayed-type", "direct");
         return new CustomExchange(
-                ExchangeUtilInterface.DELAYED_EXCHANGE_NAME,
+                ExchangeUtil.DELAYED_EXCHANGE_NAME,
                 "x-delayed-message", true, false, args);
     }
 
@@ -49,7 +49,7 @@ public class DelayedQueueConfig {
      */
     @Bean("delayedQueue")
     public Queue delayedQueue(){
-        return QueueBuilder.durable(QueueUtilInterface.DELAYED_QUEUE_NAME).build();
+        return QueueBuilder.durable(QueueUtil.DELAYED_QUEUE_NAME).build();
     }
 
     /**
@@ -63,6 +63,6 @@ public class DelayedQueueConfig {
             @Qualifier("delayedQueue") Queue delayedQueue,
             @Qualifier("delayedExchange") CustomExchange delayedExchange ){
         return BindingBuilder.bind(delayedQueue).to(delayedExchange)
-                .with(RoutingKeyUtilInterface.DELAYED_ROUTING_KEY).noargs();
+                .with(RoutingKeyUtil.DELAYED_ROUTING_KEY).noargs();
     }
 }

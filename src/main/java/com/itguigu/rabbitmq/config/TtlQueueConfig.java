@@ -1,8 +1,8 @@
 package com.itguigu.rabbitmq.config;
 
-import com.itguigu.rabbitmq.util.ExchangeUtilInterface;
-import com.itguigu.rabbitmq.util.QueueUtilInterface;
-import com.itguigu.rabbitmq.util.RoutingKeyUtilInterface;
+import com.itguigu.rabbitmq.util.ExchangeUtil;
+import com.itguigu.rabbitmq.util.QueueUtil;
+import com.itguigu.rabbitmq.util.RoutingKeyUtil;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -26,52 +26,52 @@ public class TtlQueueConfig {
 
     @Bean("xExchange")
     public DirectExchange xExchange() {
-        return ExchangeBuilder.directExchange(ExchangeUtilInterface.X_EXCHANGE).build();
+        return ExchangeBuilder.directExchange(ExchangeUtil.X_EXCHANGE).build();
     }
 
     @Bean("yExchange")
     public DirectExchange yExchange(){
-        return ExchangeBuilder.directExchange(ExchangeUtilInterface.Y_DEAD_LETTER_EXCHANGE).build();
+        return ExchangeBuilder.directExchange(ExchangeUtil.Y_DEAD_LETTER_EXCHANGE).build();
     }
 
     @Bean("queueA")
     public Queue queueA(){
         HashMap<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange",ExchangeUtilInterface.Y_DEAD_LETTER_EXCHANGE);
-        args.put("x-dead-letter-routing-key",RoutingKeyUtilInterface.YD_ROUTING_KEY);
+        args.put("x-dead-letter-exchange", ExchangeUtil.Y_DEAD_LETTER_EXCHANGE);
+        args.put("x-dead-letter-routing-key", RoutingKeyUtil.YD_ROUTING_KEY);
         args.put("x-message-ttl",10000);
-        return QueueBuilder.durable(QueueUtilInterface.QUEUE_A).withArguments(args).build();
+        return QueueBuilder.durable(QueueUtil.QUEUE_A).withArguments(args).build();
     }
 
     @Bean("queueB")
     public Queue queueB(){
         HashMap<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange",ExchangeUtilInterface.Y_DEAD_LETTER_EXCHANGE);
-        args.put("x-dead-letter-routing-key",RoutingKeyUtilInterface.YD_ROUTING_KEY);
+        args.put("x-dead-letter-exchange", ExchangeUtil.Y_DEAD_LETTER_EXCHANGE);
+        args.put("x-dead-letter-routing-key", RoutingKeyUtil.YD_ROUTING_KEY);
         args.put("x-message-ttl",40000);
-         return QueueBuilder.durable(QueueUtilInterface.QUEUE_B).withArguments(args).build();
+         return QueueBuilder.durable(QueueUtil.QUEUE_B).withArguments(args).build();
     }
 
     @Bean("queueD")
     public Queue queueD(){
-        return new Queue(QueueUtilInterface.QUEUE_D);
+        return new Queue(QueueUtil.QUEUE_D);
     }
 
     @Bean
     public Binding queueABindingxExchange(@Qualifier("queueA") Queue queueA,
                                           @Qualifier("xExchange") DirectExchange xExchange){
-        return BindingBuilder.bind(queueA).to(xExchange).with(RoutingKeyUtilInterface.XA_ROUTING_KEY);
+        return BindingBuilder.bind(queueA).to(xExchange).with(RoutingKeyUtil.XA_ROUTING_KEY);
     }
 
     @Bean
     public Binding queueBBindingxExchange(@Qualifier("queueB") Queue queueB,
             @Qualifier("xExchange") DirectExchange xExchange){
-        return BindingBuilder.bind(queueB).to(xExchange).with(RoutingKeyUtilInterface.XB_ROUTING_KEY);
+        return BindingBuilder.bind(queueB).to(xExchange).with(RoutingKeyUtil.XB_ROUTING_KEY);
     }
 
     @Bean
     public Binding queueDBindingyExchange(@Qualifier("queueD") Queue queueD,
             @Qualifier("yExchange") DirectExchange yExchange){
-        return BindingBuilder.bind(queueD).to(yExchange).with(RoutingKeyUtilInterface.YD_ROUTING_KEY);
+        return BindingBuilder.bind(queueD).to(yExchange).with(RoutingKeyUtil.YD_ROUTING_KEY);
     }
 }
