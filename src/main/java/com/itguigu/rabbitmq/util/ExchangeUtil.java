@@ -11,4 +11,5 @@ public interface ExchangeUtil {
     String DELAYED_EXCHANGE_NAME = "delayed.exchange";
     String CONFIRM_EXCHANGE_NAME = "confirm.exchange";
     String BACKUP_EXCHANGE_NAME = "backup.exchange";
+    String NOT_ROUTABLE_EXCHANGE_NAME = "not.routable.exchange";
 }

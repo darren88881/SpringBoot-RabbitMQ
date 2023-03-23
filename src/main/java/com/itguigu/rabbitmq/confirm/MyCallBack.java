@@ -52,6 +52,7 @@ public class MyCallBack implements RabbitTemplate.ConfirmCallback,RabbitTemplate
     /**
      * 交换机返回消息的方法-消息未送达队列触发回调
      * 常用于交换机无法路由回退消息
+     * 如果交换机绑定了备用交换机则是路由到备用交换机，此方法不回调。
      *
      * @param message the returned message.
      * @param replyCode the 回复 code.

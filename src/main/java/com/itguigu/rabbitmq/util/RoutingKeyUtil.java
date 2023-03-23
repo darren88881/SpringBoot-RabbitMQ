@@ -13,4 +13,6 @@ public interface RoutingKeyUtil {
     String DELAYED_ROUTING_KEY = "delayed.routing.key";
     String CONFIRM_ROUTING_KEY = "confirm.routing.key";
     String CONFIRM_ERROR_ROUTING_KEY = "confirm.error.routing.key";
+    String NOT_ROUTABLE_RIGHT_ROUTING_KEY = "not.routable.right.routing.key";
+    String NOT_ROUTABLE_ERROR_ROUTING_KEY = "not.routable.error.routing.key";
 }

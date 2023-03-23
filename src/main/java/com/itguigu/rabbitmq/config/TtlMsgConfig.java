@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @Slf4j
-public class MsgTtlQueueConfig {
+public class TtlMsgConfig {
 
 
     @Bean("queueC")

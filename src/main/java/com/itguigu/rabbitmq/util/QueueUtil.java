@@ -14,4 +14,5 @@ public interface QueueUtil {
      String CONFIRM_QUEUE_NAME = "confirm.queue";
      String BACKUP_QUEUE_NAME = "backup.queue";
      String WARNING_QUEUE_NAME = "warning.queue";
+     String NOT_ROUTABLE_QUEUE_NAME = "not.routable.queue";
 }
