@@ -24,7 +24,7 @@ public class deleteExchangeTest {
     private int num = 0;
 
     @Test
-    public void createExchange() throws IOException {
+    public void deleteExchange() throws IOException {
         RabbitmqUtils.deleteExchange(ExchangeUtil.CONFIRM_EXCHANGE_NAME);
         RabbitmqUtils.closeChannelAndConnection();
         System.out.println("删除完成");
@@ -70,6 +70,7 @@ public class deleteExchangeTest {
 
         // 传递回调
         DeliverCallback deliverCallback = (consumerTag, message) ->{
+            System.out.println(message.getProperties().getMessageId());
             num += 1;
             String msg = new String(message.getBody(),"UTF-8");
             System.out.println("收到的消息："+ msg);
