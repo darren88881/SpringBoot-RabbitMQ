@@ -28,7 +28,7 @@ public class ConfirmConfig {
     @Bean("confirmExchange")
     public DirectExchange confirmExchange() {
         return ExchangeBuilder.directExchange(ExchangeUtil.CONFIRM_EXCHANGE_NAME)
-                .durable(true).withArgument("alternate-exchange", ExchangeUtil.BACKUP_EXCHANGE_NAME).build();
+                .durable(true).alternate(ExchangeUtil.BACKUP_EXCHANGE_NAME).build();
     }
 
     @Bean("confirmQueue")

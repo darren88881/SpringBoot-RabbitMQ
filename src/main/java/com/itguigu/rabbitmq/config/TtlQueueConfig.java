@@ -36,20 +36,20 @@ public class TtlQueueConfig {
 
     @Bean("queueA")
     public Queue queueA(){
-        HashMap<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", ExchangeUtil.Y_DEAD_LETTER_EXCHANGE);
-        args.put("x-dead-letter-routing-key", RoutingKeyUtil.YD_ROUTING_KEY);
-        args.put("x-message-ttl",10000);
-        return QueueBuilder.durable(QueueUtil.QUEUE_A).withArguments(args).build();
+        return QueueBuilder
+                .durable(QueueUtil.QUEUE_A)
+                .deadLetterExchange(ExchangeUtil.Y_DEAD_LETTER_EXCHANGE)
+                .deadLetterRoutingKey(RoutingKeyUtil.YD_ROUTING_KEY)
+                .ttl(10000).build();
     }
 
     @Bean("queueB")
     public Queue queueB(){
-        HashMap<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", ExchangeUtil.Y_DEAD_LETTER_EXCHANGE);
-        args.put("x-dead-letter-routing-key", RoutingKeyUtil.YD_ROUTING_KEY);
-        args.put("x-message-ttl",40000);
-         return QueueBuilder.durable(QueueUtil.QUEUE_B).withArguments(args).build();
+         return QueueBuilder
+                 .durable(QueueUtil.QUEUE_B)
+                 .deadLetterExchange(ExchangeUtil.Y_DEAD_LETTER_EXCHANGE)
+                 .deadLetterRoutingKey(RoutingKeyUtil.YD_ROUTING_KEY)
+                 .ttl(40000).build();
     }
 
     @Bean("queueD")
