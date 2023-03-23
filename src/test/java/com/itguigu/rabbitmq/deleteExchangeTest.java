@@ -12,7 +12,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,8 +21,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class deleteExchangeTest {
 
-    private static CountDownLatch cyclicBarrier = new CountDownLatch(2);
-
     private int num = 0;
 
     @Test
@@ -31,7 +28,6 @@ public class deleteExchangeTest {
         RabbitmqUtils.deleteExchange(ExchangeUtil.CONFIRM_EXCHANGE_NAME);
         RabbitmqUtils.closeChannelAndConnection();
         System.out.println("删除完成");
-
     }
 
     /**
