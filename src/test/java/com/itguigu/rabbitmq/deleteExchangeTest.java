@@ -12,10 +12,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
