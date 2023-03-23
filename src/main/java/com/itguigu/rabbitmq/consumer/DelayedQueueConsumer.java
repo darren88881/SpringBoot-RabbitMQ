@@ -1,6 +1,5 @@
 package com.itguigu.rabbitmq.consumer;
 
-import com.itguigu.rabbitmq.util.ExchangeUtil;
 import com.itguigu.rabbitmq.util.QueueUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
