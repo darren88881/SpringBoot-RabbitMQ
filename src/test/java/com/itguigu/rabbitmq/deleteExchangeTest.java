@@ -30,6 +30,14 @@ public class deleteExchangeTest {
         System.out.println("删除完成");
     }
 
+    @Test
+    public void deleteQueue() throws IOException {
+        RabbitmqUtils.deleteQueue("QA");
+        RabbitmqUtils.deleteQueue("QB");
+        RabbitmqUtils.closeChannelAndConnection();
+        System.out.println("删除完成");
+    }
+
     /**
      * 发送消息到优先级队列
      */
