@@ -24,5 +24,6 @@ public class BackupQueueConsumer {
         String msg = new String(message.getBody());
         log.info("消费者收到队列:{} 的消息:{}", QueueUtil.BACKUP_QUEUE_NAME, msg);
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        // awdhuaiowehud
     }
 }
